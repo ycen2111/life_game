@@ -31,6 +31,18 @@ times=0
 memory_dict={}
 
 class cell:
+    """
+        Constructor method for the cell object. Initializes the attributes of the cell object, including its 
+        position (x1, y1, x2, y2), color, and the canvas on which it will be drawn.
+        
+        Parameters:
+        x1 (int): x-coordinate of the top-left corner of the cell
+        y1 (int): y-coordinate of the top-left corner of the cell
+        x2 (int): x-coordinate of the bottom-right corner of the cell
+        y2 (int): y-coordinate of the bottom-right corner of the cell
+        color (str): the color of the cell, either "white" or "grey"
+        Canvas: the canvas on which the cell will be drawn
+        """
     def __init__(self,x1,y1,x2,y2,color,Canvas):
         self.x1=x1
         self.y1=y1
@@ -42,17 +54,39 @@ class cell:
         self.determine_state(color)
         #self.print()
 
+    """
+    Method for determining the state of the cell based on its color. If the cell is "white", it is considered 
+    to be alive (liveCell = True), and if it is "grey", it is considered to be dead (liveCell = False).
+    
+    Parameters:
+    color (str): the color of the cell, either "white" or "grey"
+    """
     def determine_state(self,color):
         if color == "white":
             self.liveCell=True
         else:
             self.liveCell=False
+
+    """
+    Method for switching the state of the cell from alive to dead, or vice versa. If the cell was alive, it
+    becomes dead, and if it was dead, it becomes alive. If the `print` parameter is True, it also calls the 
+    `print` method to redraw the cell on the canvas.
     
+    Parameters:
+    print (bool): if True, call the `print` method to redraw the cell on the canvas (default: True)
+    """
     def switch_state(self,print=True):
         self.liveCell=not self.liveCell
         if print:
             self.print()
 
+    """
+        Method for shifting the position of the cell by a given amount in the x and y directions.
+        
+        Parameters:
+        dx (int): the amount to shift the cell in the x direction
+        dy (int): the amount to shift the cell in the y direction
+        """
     def ShiftPosition(self,dx,dy):
         self.x1=self.x1+dx
         self.y1=self.y1+dy
@@ -60,6 +94,14 @@ class cell:
         self.y2=self.y2+dy
         #self.print()
     
+    """
+        Method for zooming the position of the cell by a given rate around a given center point (dx, dy).
+        
+        Parameters:
+        dx (int): the x-coordinate of the center point of the zoom
+        dy (int): the y-coordinate of the center point of the zoom
+        rate (float): the zoom rate, where rate > 1 means zooming in, and rate < 1 means zooming out
+        """
     def ZoomPosition(self,dx,dy,rate):
         self.x1=self.x1*rate+dx
         self.y1=self.y1*rate+dy
@@ -67,6 +109,15 @@ class cell:
         self.y2=self.y2*rate+dy
         #self.print()
 
+    """
+        This method changes the color of the cell based on the input 'color'.
+        If 'color' is "white", then the cell is considered 'live', otherwise it is 'dead'.
+        If 'print' is True, it prints the cell on the canvas using the 'print' method.
+        
+        Parameters:
+        color (str): The color to set the cell to. Should be either "white" or any other color.
+        print (bool): If True, prints the cell on the canvas after changing its color.
+        """
     def change_color(self,color,print=True):
         #self.Canvas.delete(self)
         if color=="white":
@@ -76,6 +127,11 @@ class cell:
         if print:
             self.print()
 
+    """
+        This method prints the cell on the canvas based on its current state, using the Canvas object and
+        coordinates stored in the object's attributes. If the cell is 'live', it is colored white, otherwise it
+        is colored grey.
+        """
     def print(self):
         if self.liveCell:
             self.Canvas.create_rectangle(int(self.x1), int(self.y1), int(self.x2), int(self.y2), fill = "white", outline="")
@@ -87,18 +143,25 @@ saver_limite=20
 times_list=[]
 top_savers_dict={}
 
+# This class represents a state saver for a cellular automaton simulation.
+# It stores the starting configuration and other simulation parameters, such as the number of runs
+# and the maximum number of cells allowed in the simulation.
+# It provides methods to refresh the saved parameters and to record the starting configuration.
 class saver:
     def __init__(self,start,runs,maximum_cell):
+        # Initialize the saver object with the starting state, number of runs, and maximum number of cells
         self.record_start(start)
         self.runs=runs
         self.maximum_cell=maximum_cell
     
     def refresh(self,start,runs,maximum_cell):
+        # Refresh the saver object with new starting state, number of runs, and maximum number of cells
         self.record_start(start)
         self.runs=runs
         self.maximum_cell=maximum_cell
 
     def record_start(self,start):
+        # Record the starting state of the simulation as a list of cell objects
         self.start=[]
         self.start.extend(start)
 

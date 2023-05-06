@@ -1,6 +1,17 @@
 from tkinter import *
 from tkinter import ttk
 
+"""
+    Represents a rectangular cell on a canvas.
+
+    Attributes:
+        x1 (int): The x-coordinate of the top-left corner of the cell.
+        y1 (int): The y-coordinate of the top-left corner of the cell.
+        x2 (int): The x-coordinate of the bottom-right corner of the cell.
+        y2 (int): The y-coordinate of the bottom-right corner of the cell.
+        color (str): The color of the cell.
+        Canvas (Tkinter.Canvas): The canvas on which the cell is drawn.
+    """
 class cell:
     def __init__(self,x1,y1,x2,y2,color,Canvas):
         self.x1=x1
@@ -11,6 +22,13 @@ class cell:
         self.Canvas=Canvas
         self.print()
 
+    """
+        Shifts the position of the cell by a specified amount.
+
+        Args:
+            dx (int): The amount to shift the cell in the x direction.
+            dy (int): The amount to shift the cell in the y direction.
+        """
     def ShiftPosition(self,dx,dy):
         self.x1=self.x1+dx
         self.y1=self.y1+dy
@@ -18,11 +36,24 @@ class cell:
         self.y2=self.y2+dy
         self.print()
 
+    """
+        Draws the cell on the canvas.
+        """
     def print(self):
         self.Canvas.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill = self.color)
 
 x_pos=0
 y_pos=0
+"""
+    Handles mouse events.
+
+    Args:
+        event (Tkinter.Event): The mouse event.
+
+    Returns:
+        tuple: If the left mouse button is pressed, returns the new x and y positions of the mouse (int, int). 
+               If the left mouse button is pressed and moving, returns the change in x and y position (int, int).
+"""
 def mouse_event(event):
     global x_pos
     global y_pos
