@@ -1,15 +1,15 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: /
+// Engineer: /
 // 
 // Create Date: 07.05.2023 00:28:55
-// Design Name: 
+// Design Name: Yang Cen
 // Module Name: Core_Logic_TB
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
+// Project Name: Conway's Life Game
+// Target Devices: X7 236-L
+// Tool Versions: Vivado 2015.2
+// Description: testbench of Core_logic.v, simulate whether game rule is working
 // 
 // Dependencies: 
 // 
@@ -32,6 +32,7 @@ module Core_Logic_TB();
     
     integer i;
 
+    //Game core rules, set enter = 1 when initializing
     Core_Logic UUT(
         .clk(clk), //system clk
         .reset(reset), //reset button
@@ -40,8 +41,10 @@ module Core_Logic_TB();
         .board_out(board_out) // next state of the board
     );
     
+    //100MHz
     always #5 clk = ~clk;
     
+    //beginning of simulation
     initial begin
         clk = 0;
         enter = 0;
@@ -51,13 +54,13 @@ module Core_Logic_TB();
             board_in[i] = 1;
         end
         
-        #100 reset = 0;
-        #100 enter = 1;
+        #100 reset = 0; //start work
+        #100 enter = 1; //initialize beginning state
         #50 enter = 0;
         for (i = 0; i < SIZE_SQUARE; i = i + 1) begin
             board_in[i] = 1;
         end
-        #100 enter = 1;
+        #100 enter = 1; //initialize beginning state
         #50 enter = 0;
     end
 
