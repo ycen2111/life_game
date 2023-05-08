@@ -1,5 +1,6 @@
 # life_game
 
+Python part:
 undergraduate year 3 闲来无事编写
 基于python自带TKinter pack
 
@@ -12,3 +13,9 @@ v4为最新版本
 整体框架：https://pipirima.top/Conway%E7%94%9F%E5%91%BD%E6%B8%B8%E6%88%8F/%E7%94%9F%E5%91%BD%E6%B8%B8%E6%88%8F%E6%A1%86%E6%9E%B6%E5%BC%80%E5%8F%91-30b19784e45e/
 
 版本迭代：https://pipirima.top/Conway%E7%94%9F%E5%91%BD%E6%B8%B8%E6%88%8F/%E6%B8%B8%E6%88%8F%E4%B8%BB%E7%A8%8B%E5%BA%8F%E5%88%86%E6%9E%90-98a61fc47187/
+
+Verilog part:
+postgraduate semester 3 期间编写
+基于Vivado 2015.2版本
+
+计划通过VGA编写内置GUI，通过按钮和switch设置长宽数和速率
