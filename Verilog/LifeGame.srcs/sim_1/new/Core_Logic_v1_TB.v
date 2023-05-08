@@ -9,7 +9,7 @@
 // Project Name: Conway's Life Game
 // Target Devices: X7 236-L
 // Tool Versions: Vivado 2015.2
-// Description: testbench of Core_logic.v, simulate whether game rule is working
+// Description: testbench of Core_logic_v1.v, simulate whether game rule is working
 // 
 // Dependencies: 
 // 
@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Core_Logic_TB();
+module Core_Logic_v1_TB();
 
-    parameter BIT_NUM = 6;
+    parameter BIT_NUM = 4;
     parameter SIZE = 2**BIT_NUM;
     parameter SIZE_SQUARE = SIZE**2;
 
@@ -33,7 +33,7 @@ module Core_Logic_TB();
     integer i;
 
     //Game core rules, set enter = 1 when initializing
-    Core_Logic UUT(
+    Core_Logic_v1 UUT(
         .clk(clk), //system clk
         .reset(reset), //reset button
         .enter(enter), //input new board
@@ -50,12 +50,20 @@ module Core_Logic_TB();
         enter = 0;
         reset = 1;
         board_in = 0;
-        for (i = 0; i < SIZE; i = i + 1) begin
+        for (i = 0; i < SIZE_SQUARE; i = i + 1) begin
             board_in[i] = 1;
         end
         
         #100 reset = 0; //start work
         #100 enter = 1; //initialize beginning state
+        #50 enter = 0;
+        #50 reset = 1;
+        #50 reset = 0;
+            enter = 1;
+        #50 enter = 0;
+        #400 enter = 1;
+        #50 enter = 0;
+        #300 enter =1;
         #50 enter = 0;
     end
 

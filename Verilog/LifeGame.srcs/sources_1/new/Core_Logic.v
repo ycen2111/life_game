@@ -24,7 +24,7 @@
 
 module Core_Logic
     #(
-    parameter BIT_NUM = 2
+    parameter BIT_NUM = 6
     )
     (
     input clk, //system clk
@@ -73,6 +73,7 @@ module Core_Logic
     Based on the position, it calculates the neighbors of each cell and stores them in an array to be used in the next iteration of the game of life.
     */
     always @(posedge clk) begin
+        
         for (i = 0; i < SIZE_SQUARE; i = i + 1) begin //row
             if (i == 0) begin //top-left cornor
                 neighbors[i] <= board[i + 1] + board[i + SIZE] + board[i + SIZE + 1];
