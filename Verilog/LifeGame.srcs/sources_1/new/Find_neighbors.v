@@ -23,8 +23,10 @@
 
 module Find_neighbors
     #(
-    parameter ROW = 16,
-    parameter COLUMN = 16,
+    parameter ROW_BITS = 2, //16
+    parameter COLUMN_BIT = 2, //16
+    parameter ROW = 2**ROW_BITS,
+    parameter COLUMN = 2**COLUMN_BIT,
     parameter INPUT_SIZE = (ROW + 2) * (COLUMN + 2), //the core modified matrix and its extra nearby cell
     parameter OUTPUT_SIZE = ROW * COLUMN
     )(
