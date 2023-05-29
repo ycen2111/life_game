@@ -22,12 +22,14 @@
 
 module Mem_driver#(
     parameter MAX_ROW_BITS = 9, //512
-    parameter MAX_COLUMN_BITS = 9, //512
+    parameter MAX_COLUMN_BITS = 10, //1024
     parameter MAX_ROW = 2 ** MAX_ROW_BITS,
     parameter MAX_COLUMN = 2 ** MAX_COLUMN_BITS
     )(
     input CLK,
     input RESET,
+    //using entering
+    input enter,
     input finish,
     input W_enable,
     input [MAX_ROW_BITS - 1 : 0] row_in, //start with 0
@@ -35,15 +37,22 @@ module Mem_driver#(
     input [15 : 0] data_in,
     input [MAX_ROW_BITS - 1 : 0] row_out,
     input [MAX_COLUMN_BITS - 1 : 0] column_out,
-    output [15 : 0] data_out
+    output [15 : 0] data_out,
+    output data_out_1_bit,
+    //input single bit
+    input write_1_bit,
+    input data_in_1_bit
     );
 
     reg switch;
     reg [1 : 0] finish_edge;
+    reg [MAX_COLUMN_BITS - 1 : 0] column_out_delay;
     
-    wire [2 ** (MAX_ROW_BITS + MAX_COLUMN_BITS - 4) - 1 : 0] cell_id_in, cell_id_out;
+    wire [MAX_ROW_BITS + MAX_COLUMN_BITS - 4 : 0] cell_id_in, cell_id_out;
     wire W_enable_1, W_enable_2;
     wire [15 : 0] data_out_1, data_out_2;
+    wire [3 : 0] data_out_1_bit_id;
+    wire [3 : 0] data_in_1_bit_id;
     
     
     //(column/16)*MAX_ROW+row
@@ -53,13 +62,21 @@ module Mem_driver#(
     //read mem1, write mem1 when switch =0
     assign W_enable_1 = switch ? W_enable : 0;
     assign W_enable_2 = (~switch) ? W_enable : 0;
-    assign data_out = switch ? data_out_2 : data_out_1;
+    assign data_out = enter? (switch ? data_out_2 : data_out_1) : (switch ? data_out_1 : data_out_2);
+    //output exact required 1 cell
+    assign data_out_1_bit_id = column_out_delay[3:0];
+    assign data_out_1_bit = data_out[data_out_1_bit_id];
+    
+    assign data_in_1_bit_id = column_in[3:0];
     
     //first memory unit
     Cell_mem mem_1(
         .CLK(CLK),
         .RESET(RESET),
         .W_enable(W_enable_1),
+        .write_1_bit(write_1_bit),
+        .data_in_1_bit(data_in_1_bit),
+        .element_id(data_in_1_bit_id),
         .data_in_add(cell_id_in),
         .data_in(data_in),
         .data_out_add(cell_id_out),
@@ -71,6 +88,9 @@ module Mem_driver#(
         .CLK(CLK),
         .RESET(RESET),
         .W_enable(W_enable_2),
+        .write_1_bit(write_1_bit),
+        .data_in_1_bit(data_in_1_bit),
+        .element_id(data_in_1_bit_id),
         .data_in_add(cell_id_in),
         .data_in(data_in),
         .data_out_add(cell_id_out),
@@ -95,6 +115,10 @@ module Mem_driver#(
             else
                 switch <= switch;
         end
+    end
+    
+    always @(posedge CLK) begin
+        column_out_delay <= column_out;
     end
 
 endmodule
