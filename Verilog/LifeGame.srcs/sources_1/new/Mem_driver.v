@@ -32,12 +32,15 @@ module Mem_driver#(
     input enter,
     input finish,
     input W_enable,
-    input [MAX_ROW_BITS - 1 : 0] row_in, //start with 0
-    input [MAX_COLUMN_BITS - 1 : 0] column_in,
+    //write cell's row and column
+    input [MAX_ROW_BITS - 1 : 0] ROW_IN, //start with 0
+    input [MAX_COLUMN_BITS - 1 : 0] COLUMN_IN,
     input [15 : 0] data_in,
-    input [MAX_ROW_BITS - 1 : 0] row_out,
-    input [MAX_COLUMN_BITS - 1 : 0] column_out,
+    //read cell's row and column
+    input [MAX_ROW_BITS - 1 : 0] ROW_OUT,
+    input [MAX_COLUMN_BITS - 1 : 0] COLUMN_OUT,
     output [15 : 0] data_out,
+    //output single bit
     output data_out_1_bit,
     //input single bit
     input write_1_bit,
@@ -54,11 +57,17 @@ module Mem_driver#(
     wire [3 : 0] data_out_1_bit_id;
     wire [3 : 0] data_in_1_bit_id;
     
+    wire [MAX_ROW_BITS - 1 : 0] row_in, row_out;
+    wire [MAX_COLUMN_BITS - 1 : 0] column_in, column_out;
     
-    //(column/16)*MAX_ROW+row
-    assign cell_id_in = {column_in[4 +: MAX_ROW_BITS - 4], row_in}; 
-    assign cell_id_out = {column_out[4 +: MAX_ROW_BITS - 4], row_out};
-    //write mem1, read mem2 when switch =1
+    assign row_in = ROW_IN - 1;
+    assign row_out = ROW_OUT - 1;
+    assign column_in = COLUMN_IN - 1;
+    assign column_out = COLUMN_OUT - 1;
+    
+    //row*64 + column/16
+    assign cell_id_in = {row_in, column_in[4 +: MAX_COLUMN_BITS - 4]}; 
+    assign cell_id_out = {row_out, column_out[4 +: MAX_COLUMN_BITS - 4]};
     //read mem1, write mem1 when switch =0
     assign W_enable_1 = switch ? W_enable : 0;
     assign W_enable_2 = (~switch) ? W_enable : 0;

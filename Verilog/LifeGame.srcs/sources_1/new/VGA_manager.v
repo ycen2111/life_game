@@ -30,8 +30,8 @@ module VGA_manager#(
     //Standard Signal
     input CLK,
     input RESET,
-    input [9:0] row_in,
-    input [9:0] column_in,
+    input [MAX_ROW_BITS:0] row_in,
+    input [MAX_COLUMN_BITS:0] column_in,
     input A_WE,
     output A_DATA_OUT,
     //research cell
@@ -43,9 +43,8 @@ module VGA_manager#(
     output [MAX_COLUMN_BITS - 1 : 0] cell_column_in,
     output write_cell_en,
     output erase_cell_en,
-    //button event
-    input up_button,
-    input down_button,
+    //Canvas parameter
+    input [2:0] cell_length_level,
     //receive mouse coordinate
     input [11:0] MouseX,
     input [11:0] MouseY,
@@ -63,10 +62,9 @@ module VGA_manager#(
     wire read_finish;
     wire WE_buffer;
     wire VGA_data_out;
-    wire [2:0] cell_length_level;
     wire [MAX_ROW_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_row_num;
     wire [MAX_COLUMN_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_column_num;
-    wire mouse_cell_pixcle;
+    wire mouse_cell_pixcle, bordar_cell_pixcle;
     
     VGA_reader reader(
         //Standard Signal
@@ -82,7 +80,7 @@ module VGA_manager#(
         .read_finish(read_finish)
     );
     
-    assign VGA_DATA_IN = mouse_cell_pixcle ? CLK_out : data_from_generator;
+    assign VGA_DATA_IN = mouse_cell_pixcle ? CLK_out : bordar_cell_pixcle ? 1'b1 : data_from_generator;
     
     VGA_buffer buffer(
         // Port A - Read/Write
@@ -102,7 +100,7 @@ module VGA_manager#(
         .CLK(CLK),
         .RESET(RESET),
         .read_finish(read_finish),
-        //output screen parameter
+        //Input screen parameter
         .cell_length_level(cell_length_level),
         .start_row_num(start_row_num),
         .start_column_num(start_column_num),
@@ -119,18 +117,17 @@ module VGA_manager#(
     Mouse_operation operator(
         .CLK(CLK),
         .RESET(RESET),
+        .row_in(row_in),
+        .column_in(column_in),
         //receive cell content
         .cell_row_num(cell_row_num),
         .cell_column_num(cell_column_num),
-        //button event
-        .up_button(up_button),
-        .down_button(down_button),
+        .cell_length_level(cell_length_level),
         //receive mouse coordinate
         .MouseX(MouseX),
         .MouseY(MouseY),
         .MouseStatus(MouseStatus),
         //output screen parameter
-        .cell_length_level(cell_length_level),
         .start_row_num(start_row_num),
         .start_column_num(start_column_num),
         //input new cells when clicking
@@ -139,7 +136,9 @@ module VGA_manager#(
         .write_cell_en(write_cell_en),
         .erase_cell_en(erase_cell_en),
         //curent VGA point is belongs to mouse cell
-        .mouse_cell_pixcle(mouse_cell_pixcle)
+        .mouse_cell_pixcle(mouse_cell_pixcle),
+        //curent VGA point is belongs to bordar cell
+        .bordar_cell_pixcle(bordar_cell_pixcle)
     );
     
     wire CLK_out;

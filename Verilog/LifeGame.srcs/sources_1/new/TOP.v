@@ -74,10 +74,6 @@ module TOP#(
     );
     
     MouseTransceiver mouse(
-        //output [3:0] M_state_check,
-        //output [3:0] T_state_check,
-        //output [2:0] R_state_check,
-    
         //Standard Inputs
         .CLK(CLK),
         .RESET(RESET),
@@ -90,11 +86,30 @@ module TOP#(
         .MouseY(MouseY)
     );
     
+    wire [2 : 0] cell_length_level;
+    wire [MAX_ROW_BITS - 1 : 0] canvas_row;
+    wire [MAX_COLUMN_BITS - 1 : 0] canvas_column;
+    Canvas_manager canvas(
+        .CLK(CLK),
+        .RESET(RESET),
+        //button signal
+        .up(up_releasing),
+        .down(down_releasing),
+        .left(left_releasing),
+        .right(right_releasing),
+        //axis state
+        .axis(axis),
+        //output canvas value
+        .cell_length_level(cell_length_level),
+        .canvas_row(canvas_row),
+        .canvas_column(canvas_column)
+    );
+    
     seg7Driver seg7(
         .CLK(CLK),
         .init_process(RESET),
-        .DATA_X(MouseX),
-        .DATA_Y(MouseY),
+        .DATA_X(canvas_column),
+        .DATA_Y(canvas_row),
         .axis(axis),
         .SEG_SELECT_OUT(SEG_SELECT_OUT),
         .HEX_OUT(HEX_OUT)
@@ -104,8 +119,8 @@ module TOP#(
         //Standard Signal
         .CLK(CLK),
         .RESET(RESET),
-        .row_in(MouseY[9:0]),
-        .column_in(MouseX[9:0]),
+        .row_in(canvas_row),
+        .column_in(canvas_column),
         .A_WE(MouseStatus[0]),
         .A_DATA_OUT(A_DATA_OUT),
         //research cell
@@ -117,9 +132,8 @@ module TOP#(
         .cell_column_in(cell_column_in),
         .write_cell_en(write_cell_en),
         .erase_cell_en(erase_cell_en),
-        //button event
-        .up_button(up_releasing),
-        .down_button(down_releasing),
+        //Canvas parameter
+        .cell_length_level(cell_length_level),
         //receive mouse coordinate
         .MouseX(MouseX),
         .MouseY(MouseY),
@@ -139,11 +153,11 @@ module TOP#(
         .enter(enter),
         //input finish,
         .W_enable(write_cell_en || erase_cell_en),
-        .row_in(cell_row_in), //start with 0
-        .column_in(cell_column_in),
+        .ROW_IN(cell_row_in), //start with 0
+        .COLUMN_IN(cell_column_in),
         //input [15 : 0] data_in,
-        .row_out(row_out),
-        .column_out(column_out),
+        .ROW_OUT(row_out),
+        .COLUMN_OUT(column_out),
         /*output [15 : 0] data_out,*/
         .data_out_1_bit(data_out_1_bit),
         //input single bit

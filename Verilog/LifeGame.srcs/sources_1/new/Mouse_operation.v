@@ -29,9 +29,12 @@ module Mouse_operation#(
     )(
     input CLK,
     input RESET,
+    input [MAX_ROW_BITS:0] row_in,
+    input [MAX_COLUMN_BITS:0] column_in,
     //receive cell content
     input [MAX_ROW_BITS - 1 : 0] cell_row_num,
     input [MAX_COLUMN_BITS - 1 : 0] cell_column_num,
+    input [2:0] cell_length_level,
     //button event
     input up_button,
     input down_button,
@@ -40,7 +43,6 @@ module Mouse_operation#(
     input [11:0] MouseY,
     input [3:0] MouseStatus,
     //output screen parameter
-    output reg [2:0] cell_length_level,
     output reg [MAX_ROW_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_row_num,
     output reg [MAX_COLUMN_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_column_num,
     //enter new cells when clicking
@@ -49,11 +51,10 @@ module Mouse_operation#(
     output write_cell_en,
     output erase_cell_en,
     //curent VGA point is belongs to mouse cell
-    output mouse_cell_pixcle
+    output mouse_cell_pixcle,
+    //curent VGA point is belongs to bordar cell
+    output bordar_cell_pixcle
     );
-    
-    //row and column number of top left cell on screen
-    reg [2:0] curr_cell_length_level, next_cell_length_level;
     
     reg [MAX_ROW_BITS - 1 : 0] past_cell_row_num;
     reg [MAX_COLUMN_BITS - 1 : 0] past_cell_column_num;
@@ -72,30 +73,20 @@ module Mouse_operation#(
     
     //this pixcle belongs to mouse cell
     assign mouse_cell_pixcle = (past_cell_row_num == mouse_cell_row) & (past_cell_column_num == mouse_cell_column);
+    //boardar pixcle
+    assign bordar_cell_pixcle = (past_cell_row_num <= row_in) && (past_cell_column_num <= column_in) && (past_cell_row_num == 0 || past_cell_row_num == row_in || past_cell_column_num == 0 || past_cell_column_num == column_in);
     
     //enter new cells when clicking
-    assign write_cell_en = MouseStatus[0];
-    assign erase_cell_en = MouseStatus[1];
     assign cell_row_in = mouse_cell_row;
     assign cell_column_in = mouse_cell_column;
+    assign write_cell_en = MouseStatus[0] && (cell_row_in <= row_in) && (cell_column_in <= column_in);
+    assign erase_cell_en = MouseStatus[1];
     
     always @(posedge CLK) begin
         past_cell_row_num <= cell_row_num;
         past_cell_column_num <= cell_column_num;
         past_MouseX <= MouseX;
         past_MouseY <= MouseY;
-    end
-    
-    always @(posedge CLK) begin
-        if (RESET) begin
-            cell_length_level <= 4;
-        end
-        else begin
-            if (up_button && cell_length_level <= MAX_CELL_LENGTH_BITS)
-                cell_length_level <= cell_length_level + 1;
-            else if (down_button && cell_length_level > 0)
-                cell_length_level <= cell_length_level - 1;
-        end
     end
     
     always @(posedge CLK) begin
