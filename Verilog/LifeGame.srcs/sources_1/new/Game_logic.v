@@ -47,7 +47,7 @@ module Game_logic(
                     neighbors[i] <= row_1[i] + row_1[i+1] + row_1[i+2] + row_2[i] + row_2[i+2] + row_3[i] + row_3[i+1] + row_3[i+2];
             end
             
-            assign OUT[i] = (neighbors[i] == 3) ? 1 : (neighbors[i] == 2) ? past_row_2[i+1] : 0;
+            assign OUT[i] =  (neighbors[i] == 3) ? 1 : (neighbors[i] == 2) ? past_row_2[i+1] : 0;
         end
     endgenerate
     

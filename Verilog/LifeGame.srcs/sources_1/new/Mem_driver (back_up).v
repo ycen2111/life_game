@@ -39,7 +39,7 @@ module Mem_driver#(
     //read cell's row and column
     input [MAX_ROW_BITS - 1 : 0] ROW_OUT,
     input [MAX_COLUMN_BITS - 1 : 0] COLUMN_OUT,
-    output [15 : 0] data_out,
+    output [17 : 0] data_out,
     //output single bit
     output data_out_1_bit,
     //input single bit
@@ -53,15 +53,12 @@ module Mem_driver#(
     
     wire [MAX_ROW_BITS + MAX_COLUMN_BITS - 4 : 0] cell_id_in, cell_id_out;
     wire W_enable_1, W_enable_2;
-    wire [15 : 0] data_out_1, data_out_2;
+    wire [17 : 0] data_out_1, data_out_2;
     wire [3 : 0] data_out_1_bit_id;
     wire [3 : 0] data_in_1_bit_id;
     
     wire [MAX_ROW_BITS - 1 : 0] row_in, row_out;
     wire [MAX_COLUMN_BITS - 1 : 0] column_in, column_out;
-    
-    wire right_neighbor_1, right_neighbor_2;
-    wire left_neighbor_1, left_neighbor_2;
     
     assign row_in = ROW_IN - 1;
     assign row_out = ROW_OUT - 1;

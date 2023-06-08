@@ -38,12 +38,12 @@ module Canvas_manager#(
     input axis,
     //output canvas value
     output reg [2:0] cell_length_level,
-    output reg [MAX_ROW_BITS:0] canvas_row,
-    output reg [MAX_COLUMN_BITS:0] canvas_column
+    output reg [MAX_ROW_BITS - 1:0] canvas_row,
+    output reg [MAX_COLUMN_BITS - 1:0] canvas_column
     );
     
-    parameter ORIGIN_ROW = 64;
-    parameter ORIGIN_COLUMN = 64;
+    parameter ORIGIN_ROW = 16;
+    parameter ORIGIN_COLUMN = 16;
     
     always @(posedge CLK) begin
         if (RESET) begin

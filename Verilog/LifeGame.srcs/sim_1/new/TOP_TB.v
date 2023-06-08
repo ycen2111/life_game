@@ -27,11 +27,12 @@ module TOP_TB();
     parameter MAX_ROW = 2 ** MAX_ROW_BITS;
     parameter MAX_COLUMN = 2 ** MAX_COLUMN_BITS;
 
-    reg CLK, RESET;
+    reg CLK, RESET, enter;
     
     TOP UUT(
         .CLK(CLK),
-        .RESET(RESET)
+        .RESET(RESET),
+        .enter(enter)
     );
     
     always #5 CLK = ~CLK;
@@ -39,8 +40,9 @@ module TOP_TB();
     initial begin
         CLK = 0;
         RESET = 1;
+        enter = 0;
         #50 RESET = 0;
-        #50;
+            enter = 1;
     end
 
 endmodule

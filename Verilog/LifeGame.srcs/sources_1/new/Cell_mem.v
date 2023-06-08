@@ -55,15 +55,13 @@ module Cell_mem#(
             Mem[data_in_add] <= Mem[data_in_add];
     end
     
-    //the left and right nrighbors of this element
-    wire left_cell, right_cell;
-    
     //read data out of memory
     always @(posedge CLK) begin
         if (RESET)
             data_out <= 0;
-        else
-            data_out <= Mem[data_out_add];
+        else begin
+             data_out <= Mem[data_out_add];
+        end
     end
     
 endmodule

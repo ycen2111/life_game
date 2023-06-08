@@ -57,8 +57,23 @@ module TOP#(
     wire data_out_1_bit;
     wire [MAX_ROW_BITS - 1 : 0] cell_row_in;
     wire [MAX_COLUMN_BITS - 1 : 0] cell_column_in;
-    wire write_cell_en, erase_cell_en;
-       
+    wire write_cell_en, erase_cell_en, frame_write_en;
+    wire [MAX_ROW_BITS - 1:0] row_to_read_mem;
+    wire [MAX_COLUMN_BITS - 1:0] column_to_read_mem;
+    wire [MAX_ROW_BITS - 1:0] ROW_OUT, ROW_IN, row_to_write_mem;
+    wire [MAX_COLUMN_BITS - 1:0] COLUMN_OUT, COLUMN_IN, column_to_write_mem;
+    wire [15 : 0] data_out_15_bits;
+    wire [15:0] data_from_frame_to_mem;
+    wire [2 : 0] cell_length_level;
+    wire [MAX_ROW_BITS - 1 : 0] canvas_row;
+    wire [MAX_COLUMN_BITS - 1 : 0] canvas_column;
+    wire WE_buffer;
+    
+    assign ROW_OUT = WE_buffer ? row_out : row_to_read_mem;
+    assign COLUMN_OUT = WE_buffer ? column_out : column_to_read_mem;
+    assign ROW_IN = frame_write_en ? row_to_write_mem : cell_row_in;
+    assign COLUMN_IN = frame_write_en ? column_to_write_mem : cell_column_in;
+   
     Button_detector detector(
         //Standard Inputs
         .CLK(CLK),
@@ -86,9 +101,6 @@ module TOP#(
         .MouseY(MouseY)
     );
     
-    wire [2 : 0] cell_length_level;
-    wire [MAX_ROW_BITS - 1 : 0] canvas_row;
-    wire [MAX_COLUMN_BITS - 1 : 0] canvas_column;
     Canvas_manager canvas(
         .CLK(CLK),
         .RESET(RESET),
@@ -126,6 +138,7 @@ module TOP#(
         //research cell
         .cell_row_num(row_out),
         .cell_column_num(column_out),
+        .WE_buffer(WE_buffer),
         .cell_value(data_out_1_bit),
         //input new cells when clicking
         .cell_row_in(cell_row_in),
@@ -151,18 +164,42 @@ module TOP#(
         .CLK(CLK),
         .RESET(RESET),
         .enter(enter),
-        //input finish,
-        .W_enable(write_cell_en || erase_cell_en),
-        .ROW_IN(cell_row_in), //start with 0
-        .COLUMN_IN(cell_column_in),
+        .finish(frame_finish),
+        .W_enable(write_cell_en || erase_cell_en || frame_write_en),
+        .ROW_IN(ROW_IN), //start with 0
+        .COLUMN_IN(COLUMN_IN),
+        .data_in(data_from_frame_to_mem),
         //input [15 : 0] data_in,
-        .ROW_OUT(row_out),
-        .COLUMN_OUT(column_out),
-        /*output [15 : 0] data_out,*/
+        .ROW_OUT(ROW_OUT/*row_to_read_mem*/),
+        .COLUMN_OUT(COLUMN_OUT/*column_to_read_mem*/),
+        .data_out(data_out_15_bits),
         .data_out_1_bit(data_out_1_bit),
         //input single bit
         .write_1_bit(write_cell_en || erase_cell_en),
         .data_in_1_bit(write_cell_en ? 1 : 0)
+    );
+    
+    Frame_calculator Frame(
+        //Standard Signal
+        .CLK(CLK),
+        .RESET(RESET),
+        .enter(enter),
+        //start new frame calculation
+        .new_frame(WE_buffer),
+        //canvas parameter
+        .ROW(canvas_row),
+        .COLUMN(canvas_column),
+        //read mem
+        .row_to_read_mem(row_to_read_mem),
+        .column_to_read_mem(column_to_read_mem),
+        .data_from_mem(data_out_15_bits),
+        //write mem
+        .OUT(data_from_frame_to_mem),
+        .mem_write_en(frame_write_en),
+        .row_to_write_mem(row_to_write_mem),
+        .column_to_write_mem(column_to_write_mem),
+        //finish sign
+        .frame_finish(frame_finish)
     );
     
 endmodule

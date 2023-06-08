@@ -37,6 +37,7 @@ module VGA_manager#(
     //research cell
     output [MAX_ROW_BITS - 1 : 0] cell_row_num,
     output [MAX_COLUMN_BITS - 1 : 0] cell_column_num,
+    output WE_buffer,
     input cell_value,
     //input new cells when clicking
     output [MAX_ROW_BITS - 1 : 0] cell_row_in,
@@ -60,7 +61,6 @@ module VGA_manager#(
     wire [18:0] VGA_ADDR_OUT, VGA_ADDR_IN;
     wire VGA_DATA_OUT, VGA_DATA_IN, data_from_generator;
     wire read_finish;
-    wire WE_buffer;
     wire VGA_data_out;
     wire [MAX_ROW_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_row_num;
     wire [MAX_COLUMN_BITS + MAX_CELL_LENGTH_BITS - 1 : 0] start_column_num;
